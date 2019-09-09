@@ -1,0 +1,484 @@
+#define ledPin D1
+
+void setup() {
+ 
+  pinMode(ledPin, OUTPUT);
+  pinMode(LED_BUILTIN,OUTPUT);
+  digitalWrite(LED_BUILTIN,HIGH);
+  digitalWrite(ledPin, HIGH);
+  Serial.begin(9600);
+}
+void loop() {
+  int ranNumber = random(1,10);
+  Serial.println(ranNumber);
+  if (ranNumber % 2 ==0){
+    digitalWrite(LED_BUILTIN, LOW);
+    delay(1000);
+    digitalWrite(LED_BUILTIN, HIGH);   
+    delay(200);
+}else{
+    digitalWrite(ledPin,LOW);
+    delay(1000);
+    digitalWrite(ledPin,HIGH);
+    delay(200);
+}
+}
+#########################################################
+#include "DHT.h"
+
+#define DHTPIN 2 
+
+#define DHTTYPE DHT22   
+
+#define ledPin D1
+
+DHT dht(DHTPIN, DHTTYPE);
+
+void setup() {
+  Serial.begin(9600);
+  Serial.println(F("DHTxx test!"));
+  pinMode(ledPin, OUTPUT);
+  digitalWrite(ledPin, HIGH);
+  Serial.begin(9600);
+
+  dht.begin();
+}
+
+void loop() {
+  
+  delay(2000);
+
+  float h = dht.readHumidity();
+
+  float t = dht.readTemperature();
+
+  float f = dht.readTemperature(true);
+
+
+  if (isnan(h) || isnan(t) || isnan(f)) {
+    Serial.println(F("Failed to read from DHT sensor!"));
+    return;
+  }
+
+  float hif = dht.computeHeatIndex(f, h);
+
+  float hic = dht.computeHeatIndex(t, h, false);
+
+  Serial.print(F("Humidity: "));
+  Serial.print(h);
+  Serial.print(F("%  Temperature: "));
+  Serial.print(t);
+  Serial.print(F("°C "));
+  Serial.print(f);
+  Serial.print(F("°F  Heat index: "));
+  Serial.print(hic);
+  Serial.print(F("°C "));
+  Serial.print(hif);
+  Serial.println(F("°F"));
+ if (t < 30){
+    digitalWrite(ledPin,LOW);
+    delay(1000);
+}else{
+    digitalWrite(ledPin,HIGH);
+    delay(1000);
+ }
+}
+########################################################
+#define BLYNK_PRINT Serial
+
+
+#include <ESP8266WiFi.h>
+#include <BlynkSimpleEsp8266.h>
+
+
+char auth[] = "2K-5r3sp5XGa3MDqwwjYeHAntg1JCJky";
+
+
+char ssid[] = "Fastt.";
+char pass[] = "ffaastt.";
+
+void setup()
+{
+
+  Serial.begin(9600);
+
+  Blynk.begin(auth, ssid, pass);
+
+}
+
+void loop()
+{
+  Blynk.run();
+}
+####################################################################
+#define BLYNK_PRINT Serial
+
+
+#include <ESP8266WiFi.h>
+#include <BlynkSimpleEsp8266.h>
+#include <DHT.h>
+
+char auth[] = "2K-5r3sp5XGa3MDqwwjYeHAntg1JCJky";
+char ssid[] = "Fastt.";
+char pass[] = "ffaastt.";
+
+#define DHTPIN D4          
+#define DHTTYPE DHT22   
+
+
+DHT dht(DHTPIN, DHTTYPE);
+BlynkTimer timer;
+
+void sendSensor()
+{
+  float h = dht.readHumidity();
+  float t = dht.readTemperature();
+  Serial.println(t);
+  Serial.println(h);
+
+  if (isnan(h) || isnan(t)) {
+    Serial.println("Failed to read from DHT sensor!");
+    return;
+  }
+
+  Blynk.virtualWrite(V5, h);
+  Blynk.virtualWrite(V6, t);
+}
+
+void setup()
+{
+  Serial.begin(9600);
+  Blynk.begin(auth,ssid,pass);
+  dht.begin();
+
+  timer.setInterval(1000L, sendSensor);
+}
+
+void loop()
+{
+  Blynk.run();
+  timer.run();
+}
+####################################################################
+#define BLYNK_PRINT Serial
+#include <ESP8266WiFi.h>
+#include <BlynkSimpleEsp8266.h>
+char auth[] = "ie7x2kHNp3-Kbxiz7scmAT_j_MtNF9o_";
+char ssid[] = "Fastt.";
+char pass[] = "ffaastt.";
+
+void setup()
+{
+  Serial.begin(9600);
+
+  //Blynk.begin(auth, ssid, pass);
+  Blynk.begin(auth, ssid, pass, "oasiskit.com", 8080);
+  //Blynk.begin(auth, ssid, pass, IPAddress(192,168,1,100), 8080);
+}
+
+void loop()
+{
+  Blynk.run();
+}
+####################################################################
+#define BLYNK_PRINT Serial
+#include <ESP8266WiFi.h>
+#include <BlynkSimpleEsp8266.h>
+int ledpin = D0;
+int button = D4;
+int buttonState = 0;
+void setup() {
+  Serial.begin(9600);
+  pinMode(ledpin,OUTPUT);
+  pinMode(button,INPUT);
+}
+void loop(){
+  buttonState = digitalRead(button);
+  Serial.print("buttonState : ");
+  Serial.println(buttonState);
+  if (buttonState==0)
+  {
+    digitalWrite(ledpin,HIGH);
+    delay(200);
+  }
+  if (buttonState==1)
+  {
+    digitalWrite(ledpin,LOW);
+    delay(200);
+  }
+}
+####################################################################
+#define BLYNK_PRINT Serial
+#include <ESP8266WiFi.h>
+#include <BlynkSimpleEsp8266.h>
+#include <DHT.h>
+char auth[] = "ie7x2kHNp3-Kbxiz7scmAT_j_MtNF9o_";
+char ssid[] = "Fastt.";
+char pass[] = "ffaastt.";
+#define DHTPIN D5
+#define DHTTYPE DHT22
+DHT dht(DHTPIN, DHTTYPE);
+BlynkTimer timer;
+void sendSensor()
+{
+  float h = dht.readHumidity();
+  float t = dht.readTemperature();
+  if (isnan(h) || isnan(t)) {
+    Serial.println("Failed to read from DHT sensor!");
+    return;
+  }
+  Blynk.virtualWrite(V5, h);
+  Blynk.virtualWrite(V6, t);
+}
+void setup()
+{
+  Serial.begin(9600);
+
+  Blynk.begin(auth, ssid, pass, "oasiskit.com", 8080);
+
+  dht.begin();
+
+  timer.setInterval(1000L, sendSensor);
+}
+
+void loop()
+{
+  Blynk.run();
+  timer.run();
+}
+####################################################################
+#define BLYNK_PRINT Serial
+#define ledPin D0
+
+#include <ESP8266WiFi.h>
+#include <BlynkSimpleEsp8266.h>
+#include <DHT.h>
+
+char auth[] = "ie7x2kHNp3-Kbxiz7scmAT_j_MtNF9o_";
+char ssid[] = "Fastt.";
+char pass[] = "ffaastt.";
+#define DHTPIN D5   
+#define DHTTYPE DHT22  
+
+DHT dht(DHTPIN, DHTTYPE);
+BlynkTimer timer;
+
+void sendSensor()
+{
+  float h = dht.readHumidity();
+  float t = dht.readTemperature(); 
+
+  if (isnan(h) || isnan(t)) {
+    Serial.println("Failed to read from DHT sensor!");
+    return;
+  }
+  Blynk.virtualWrite(V5, h);
+  Blynk.virtualWrite(V6, t);
+}
+
+void setup()
+{
+  Serial.begin(9600);
+  
+  Serial.println(F("DHTxx test!"));
+  pinMode(ledPin, OUTPUT);
+  digitalWrite(ledPin, HIGH);
+  Serial.begin(9600);
+
+  Blynk.begin(auth, ssid, pass, "oasiskit.com", 8080);
+
+  dht.begin();
+  timer.setInterval(1000L, sendSensor);
+}
+
+void loop()
+{
+  delay(2000);
+
+  float h = dht.readHumidity();
+
+  float t = dht.readTemperature();
+
+  float f = dht.readTemperature(true);
+
+
+  if (isnan(h) || isnan(t) || isnan(f)) {
+    Serial.println(F("Failed to read from DHT sensor!"));
+    return;
+  }
+
+  float hif = dht.computeHeatIndex(f, h);
+
+  float hic = dht.computeHeatIndex(t, h, false);
+
+  Serial.print(F("Humidity: "));
+  Serial.print(h);
+  Serial.print(F("%  Temperature: "));
+  Serial.print(t);
+  Serial.print(F("°C "));
+  Serial.print(f);
+  Serial.print(F("°F  Heat index: "));
+  Serial.print(hic);
+  Serial.print(F("°C "));
+  Serial.print(hif);
+  Serial.println(F("°F"));
+ if (t < 30){
+    digitalWrite(ledPin,LOW);
+    delay(1000);
+}else{
+    digitalWrite(ledPin,HIGH);
+    delay(1000);
+  Blynk.run();
+  timer.run();
+}
+}
+####################################################################
+#define BLYNK_PRINT Serial
+#include <ESP8266WiFi.h>
+#include <BlynkSimpleEsp8266.h>
+#define TRIGGERPIN D5
+#define ECHOPIN D6
+
+char auth[] = "ie7x2kHNp3-Kbxiz7scmAT_j_MtNF9o_";
+char ssid[] = "Fastt.";
+char pass[] = "ffaastt.";
+
+WidgetLCD lcd(V1);
+
+void setup()
+{
+  Serial.begin(9600);
+  pinMode(TRIGGERPIN,OUTPUT);
+  pinMode(ECHOPIN,INPUT);
+  Blynk.begin(auth, ssid, pass, "oasiskit.com", 8080);
+
+  lcd.clear();
+  lcd.print(0,0,"Distance in cm");
+}
+
+void loop()
+{
+  lcd.clear();
+  lcd.print(0,0,"Distance in cm");
+  long duration,distance;
+  digitalWrite(TRIGGERPIN,LOW);
+  delayMicroseconds(3);
+  digitalWrite(TRIGGERPIN,HIGH);
+  delayMicroseconds(12);
+  
+  digitalWrite(TRIGGERPIN,LOW);
+  duration = pulseIn(ECHOPIN,HIGH);
+  distance = (duration/2) / 29.1;
+  Serial.print(distance);
+  Serial.println("Cm");
+  lcd.print(7,1,distance);
+  Blynk.run();
+  delay(3500);
+}
+####################################################################
+#define BLYNK_PRINT Serial
+#include <ESP8266WiFi.h>
+#include <BlynkSimpleEsp8266.h>
+#define TRIGGERPIN D5
+#define ECHOPIN D6
+
+char auth[] = "ie7x2kHNp3-Kbxiz7scmAT_j_MtNF9o_";
+char ssid[] = "Fastt.";
+char pass[] = "ffaastt.";
+
+BLYNK_WRITE(V2){
+  int r = param[0].asInt();
+  int g = param[1].asInt();
+  int b = param[2].asInt();
+}
+WidgetLCD lcd(V1);
+
+void setup()
+{
+  Serial.begin(9600);
+  pinMode(TRIGGERPIN,OUTPUT);
+  pinMode(ECHOPIN,INPUT);
+  Blynk.begin(auth, ssid, pass, "oasiskit.com", 8080);
+
+  lcd.clear();
+  lcd.print(0,0,"Distance in cm");
+}
+
+void loop()
+{
+  lcd.clear();
+  lcd.print(0,0,"Distance in cm");
+  long duration,distance;
+  digitalWrite(TRIGGERPIN,LOW);
+  delayMicroseconds(3);
+  digitalWrite(TRIGGERPIN,HIGH);
+  delayMicroseconds(12);
+  
+  digitalWrite(TRIGGERPIN,LOW);
+  duration = pulseIn(ECHOPIN,HIGH);
+  distance = (duration/2) / 29.1;
+  Serial.print(distance);
+  Serial.println("Cm");
+  lcd.print(7,1,distance);
+  Blynk.run();
+  delay(3500);
+}
+####################################################################
+#include <Wire.h>
+#include <SPI.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
+#define OLED_RESET -1
+
+int BH1750_Read(int address);
+void BH1750_Init(int address);
+
+
+Adafruit_SSD1306 OLED(OLED_RESET);
+
+int BH1750address = 0x23;
+byte buff[2];
+void setup()
+{
+  OLED.begin(SSD1306_SWITCHCAPVCC,0x3C);
+  BH1750_Init(BH1750address);
+}
+
+void loop()
+{
+  uint16_t val = 0;
+  BH1750_Init(BH1750address);
+  delay(200);
+  if (2 == BH1750_Read(BH1750address))
+  {
+    val = (buff[0]<<8 | buff[1]) / 1.2 ;
+    OLED.clearDisplay();
+    OLED.setTextColor(WHITE);
+    OLED.setCursor(0,0);
+    OLED.setTextSize(1);
+    //OLED.prinln("BH1750");
+    OLED.setCursor(0,0);
+    OLED.println("Light"+String(val)+"lx");
+    OLED.display();
+  }
+  delay(150);
+ }
+int BH1750_Read(int address)
+{
+  int i = 0;
+  Wire.beginTransmission(address);
+  Wire.requestFrom(address,2);
+  while (Wire.available())
+  {
+    buff[i] = Wire.read();
+    i++;
+  }
+  Wire.endTransmission();
+  return i;
+}
+void BH1750_Init(int address)
+{
+  Wire.beginTransmission(address);
+  Wire.write(0x10);
+  Wire.endTransmission();
+}
